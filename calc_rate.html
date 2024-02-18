@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>レート計算</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 20px;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    input {
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 8px 15px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    p {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    #notes_w {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+  </style>
+  <script>
+    var scoreThresholds = [
+    { threshold: 1009000, rank: 'SSS+' , base: 2.15, diff: 10000},
+    { threshold: 1007500, rank: 'SSS' , base: 2.00, diff: 100},
+    { threshold: 1005000, rank: 'SS+' , base: 1.50, diff: 50},
+    { threshold: 1000000, rank: 'SS' , base: 1.00, diff: 100},
+    { threshold: 990000, rank: 'S+' , base: 0.60, diff: 250},
+    { threshold: 975000, rank: 'S' , base: 0.00, diff: 250},
+    { threshold: 950000, rank: 'AAA' , base: -1.50, diff: 166.67},
+    { threshold: 925000, rank: 'AA' , base: -3.00, diff: 166.67},
+    { threshold: 900000, rank: 'A' , base: -5.00, diff: 125},
+    { threshold: 800000, rank: 'BBB' , base: -10.00, diff: 10000},
+    { threshold: 700000, rank: 'BB' , base: -15.00, diff: 10000},
+    { threshold: 600000, rank: 'B' , base: -20.00, diff: 10000},
+    { threshold: 500000, rank: 'C' , base: -25.00, diff: 10000},
+    { threshold: 0, rank: 'D' , base: -99.00, diff: 10000}
+    ];
+
+    var perfect_w;
+    var great_w;
+    var good_w;
+
+    function defWeight(){
+      perfect_w=1.01;
+      great_w=1.00;
+      good_w=0.50;
+      document.getElementById('notes_w').innerHTML = '比重: (perfect, great, good)= (' + perfect_w + ', ' + great_w + ', ' + good_w + ')';
+    }
+
+    function addNumbers() {
+      var perfectInput = document.getElementById('perfect');
+      var greatInput = document.getElementById('great');
+      var goodInput = document.getElementById('good');
+      var missInput = document.getElementById('miss');
+      var numInput = document.getElementById('num');
+
+      var perfect = parseFloat(perfectInput.value);
+      var great = parseFloat(greatInput.value);
+      var good = parseFloat(goodInput.value);
+      var miss = parseFloat(missInput.value);
+      var rate = parseFloat(numInput.value);
+
+      var rank = 'D';
+
+      var errorMessage = document.getElementById('error-message');
+      
+      if (isNaN(perfect) || isNaN(great) || isNaN(good) || isNaN(miss)) {
+        errorMessage.innerHTML = '属性を入力してください';
+        return;
+      }
+
+      errorMessage.innerHTML = '';  // Clear error message
+
+      var total_notes = perfect + great + good + miss;
+      var raw_score = 1000000 / total_notes;
+      var score = (perfect * perfect_w + great * great_w + good * good_w) * raw_score;
+
+      for (var i = 0; i < scoreThresholds.length; i++) {
+        if (score >= scoreThresholds[i].threshold) {
+          rank = scoreThresholds[i].rank;
+
+          // ウニ定数に変換
+          //rate=rate/2.41;
+          rate=((15-14)/(36-31))*(rate-31)+14;
+
+          rate=rate+scoreThresholds[i].base+parseInt((score-scoreThresholds[i].threshold)/scoreThresholds[i].diff)*0.01;
+          
+          // プ定数に逆変換
+          //rate=rate*2.41;
+          rate=((36-31)/(15-14))*(rate-14)+31;
+          rate/=1.2;
+
+          rate=parseInt(rate*100)/100;
+
+          break;
+        }
+      }
+
+      document.getElementById('total_notes').innerHTML = '総ノーツ: ' + parseInt(total_notes);
+      document.getElementById('result').innerHTML = 'SCORE: ' + parseInt(score);
+      document.getElementById('rank').innerHTML = 'RANK: ' + rank;
+      document.getElementById('rate').innerHTML = '単曲レート: ' + rate;
+    }
+
+    function setupArrowKeyNavigation() {
+      var inputs = document.querySelectorAll('input[type="text"]');
+      
+      inputs.forEach(function (input, index) {
+        input.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowUp' && index > 0) {
+            inputs[index - 1].focus();
+          } else if (event.key === 'ArrowDown' && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          } else if (event.key === 'Enter') {
+            addNumbers();
+          }
+        });
+      });
+    }
+  </script>
+</head>
+<body onload="setupArrowKeyNavigation()">
+  <h1>スコア計算</h1>
+  <p id="notes_w"></p><br>
+  Perfect: <input type="text" id="perfect" placeholder="Perfect"><br>
+  Great: <input type="text" id="great" placeholder="Great"><br>
+  Good: <input type="text" id="good" placeholder="Good"><br>
+  Miss: <input type="text" id="miss" placeholder="Miss"><br>
+  譜面定数(optional): <input type="text" id="num" placeholder="Num"><br>
+  <span id="error-message" class="error"></span>
+  
+  <button onclick="addNumbers()">スコア計算する</button><br>
+
+  <p id="total_notes"></p>
+  <p id="result"></p>
+  <p id="rank"></p>
+  <p id="rate"></p>
+  <script>
+    defWeight();
+  </script>
+</body>
+</html>
