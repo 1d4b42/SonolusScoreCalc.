@@ -1,9 +1,9 @@
-### SonolusScoreCalc.
+# SonolusScoreCalc.
 ## 計算方法
-# スコア計算
+### スコア計算
 score = (perfect数×1.01 + great数×1.00 + good数×0.5) × (1000000÷総ノーツ数)
 
-# 単曲レート計算
+### 単曲レート計算
 threshold=各ランクの下限, rank=ランク, base=下限値でのベースからのレート上昇分, diff=このスコアごとにレートが0.01上がる
 { threshold: 1009000, rank: 'SSS+' , base: 2.15, diff: 10000},
 { threshold: 1007500, rank: 'SSS' , base: 2.00, diff: 100},
@@ -29,6 +29,6 @@ rate = 譜面定数 + base + ((score - threshold)/diff)*0.01
 譜面定数をsonolus基準に逆変換し、1.2倍する
 sonolus_rate=(((36-31)/(15-14))*(chunithm_rate-14)+31)*1.2
 
-# 総合レート計算
+### 総合レート計算
 単曲レートが最も高いもの最大10個を計算対象とする.
 rate_avg = (レート対象曲の単曲レートの合計/10)*0.75 + (単曲レート1位の曲の単曲レート値)*0.25
