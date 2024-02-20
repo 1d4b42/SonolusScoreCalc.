@@ -155,8 +155,8 @@
       document.getElementById('rank').innerHTML = 'RANK: ' + rank;
       document.getElementById('rate').innerHTML = '単曲レート: ' + rate;
 
-      resultText = resultText + songname+', '+score+', '+rank+', '+rate+'\n';
-      
+      resultText = resultText + songname+', '+parseInt(score)+', '+rank+', '+rate+'\n';
+      alert(resultText);
       // 改行して出す
       resultText_lines = resultText.split('\n');
       document.getElementById('inputtext').innerHTML = '';
@@ -207,7 +207,7 @@
       errorMessage.innerHTML = '';  // Clear error message
 
       //resultText = inputfile_text;
-      //resultText = resultText + songname+', '+parseInt(score)+', '+rank+', '+rate+'\n';
+      //resultText = resultText + songname+', '+score+', '+rank+', '+rate+'\n';
 
       // ファイル作成
       var blob = new Blob([resultText], { type: 'text/plain' });
