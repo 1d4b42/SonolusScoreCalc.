@@ -1,4 +1,5 @@
 # SonolusScoreCalc.
+https://1d4b42.github.io/SonolusScoreCalc./
 ## 計算方法
 ### スコア計算
 score = (perfect数×1.01 + great数×1.00 + good数×0.5) × (1000000÷総ノーツ数)
